@@ -49,7 +49,7 @@ api('POST', '/api/companies', function () use ($data) {
     ]);
     response(code: 201);
 });
-api('PUT', '/api/companies/<id>', function ($request) use ($data) {
+api('POST', '/api/companies/edit/<id>', function ($request) use ($data) {
     $company = db_getById('companies', $request['id']);
 
     $errors = [];
@@ -108,7 +108,7 @@ api('POST', '/api/countries', function () use ($data) {
     ]);
     response(code: 201);
 });
-api('PUT', '/api/countries/<id>', function ($request) use ($data) {
+api('POST', '/api/countries/edit/<id>', function ($request) use ($data) {
     $country = db_getById('countries', $request['id']);
 
     $errors = [];
