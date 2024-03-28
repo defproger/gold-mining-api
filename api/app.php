@@ -146,11 +146,61 @@ api('DELETE', '/api/countries/<id>', function ($request) {
 ///
 /// Reports
 ///
-api('POST', '/api/reports/<month>', function () {
-    response();
+api('GET', '/api/reports/<month>', function ($request) {
+    if ($request['month'] <= date('m')) {
+        $year = date('Y');
+    } else {
+        $year = date('Y') - 1;
+    }
+    $dateFrom = date("$year-{$request['month']}-01 00:00:00");
+    $dateTo = date('Y-m-d 00:00:00', strtotime("$dateFrom +1 month"));
+
+    $reports = queryAll("SELECT m.*, c.id as country_id, c.name as country, c.plan as plan
+         FROM mining m
+         left join companies cm on cm.id = m.company_id
+         left join countries c on c.id = cm.country_id
+         WHERE m.date > :dateFrom and m.date < :dateTo",
+        ['dateFrom' => $dateFrom, 'dateTo' => $dateTo]);
+
+    $sortedData = [];
+    foreach ($reports as $report) {
+        $sortedData[$report['country_id']] = [
+            'id' => $report['country_id'],
+            'country' => $report['country'],
+            'plan' => $report['plan'],
+            'mined' => 0,
+        ];
+    }
+    foreach ($reports as $report) {
+        $sortedData[$report['country_id']]['mined'] += $report['mined'];
+    }
+    usort($sortedData, function ($a, $b) {
+        return $b['mined'] - $a['mined'];
+    });
+    response($sortedData);
 });
 /// OTHER
 api('POST', '/api/generate', function () {
+    $companies = db_getAll('companies');
+
+    $generated = [];
+    $start = strtotime('-6 months');
+    $end = time();
+
+    foreach ($companies as $company) {
+        for ($i = 0; $i < rand(50, 500); $i++) {
+            $mined = rand(100, 10000);
+            $date = date('Y-m-d H:i:s', rand($start, $end));
+            $generated[] = [
+                'company_id' => $company['id'],
+                'mined' => $mined,
+                'date' => $date,
+            ];
+        }
+    }
+    foreach ($generated as $item) {
+        db_insert('mining', $item);
+    }
     response();
 });
 

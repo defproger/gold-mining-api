@@ -29,6 +29,12 @@ if (@$_GET['deleteCountry']) {
     exit();
 }
 
+if (@$_GET['generateData']) {
+    request('POST', 'generateData', []);
+    header('Location: index.php');
+    exit();
+}
+
 if ($_POST) {
     if ($_POST['method'] === 'editCompany') {
         request('POST', "companies/edit/{$_POST['id']}", $_POST);
@@ -50,6 +56,10 @@ if ($_POST) {
         header('Location: index.php');
         exit();
     }
+}
+
+if (@$_GET['month']) {
+    $reports = request('GET', "reports/{$_GET['month']}", []);
 }
 
 
@@ -213,7 +223,47 @@ $companies = request('GET', 'companies/list', []);
     </div>
     <div class="tab" style="display: none">
         <h1>Leaders</h1>
-        <div></div>
+        <div>
+            <form action="" method="get">
+                <select name="month">
+                    <option value="1">January</option>
+                    <option value="2">February</option>
+                    <option value="3">March</option>
+                    <option value="4">April</option>
+                    <option value="5">May</option>
+                    <option value="6">June</option>
+                    <option value="7">July</option>
+                    <option value="8">August</option>
+                    <option value="9">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                </select>
+                <button type="submit">[ Show Report ]</button>
+                <a href="index.php?generateData">[ Generate data ]</a>
+            </form>
+            <br>
+            <br>
+            <br>
+            <?php if (!empty($reports)): ?>
+                <table>
+                    <tr>
+                        <th>Id</th>
+                        <th>Country</th>
+                        <th>Plan</th>
+                        <th>Mining</th>
+                    </tr>
+                    <?php foreach ($reports as $item): ?>
+                        <tr>
+                            <td><?= $item['id'] ?></td>
+                            <td><?= $item['country'] ?></td>
+                            <td><?= $item['plan'] ?></td>
+                            <td><?= $item['mined'] ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </table>
+            <?php endif; ?>
+        </div>
     </div>
 </div>
 <script>
