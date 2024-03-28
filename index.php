@@ -30,7 +30,7 @@ if (@$_GET['deleteCountry']) {
 }
 
 if (@$_GET['generateData']) {
-    request('POST', 'generateData', []);
+    request('POST', 'generate', []);
     header('Location: index.php');
     exit();
 }
@@ -240,7 +240,7 @@ $companies = request('GET', 'companies/list', []);
                     <option value="12">December</option>
                 </select>
                 <button type="submit">[ Show Report ]</button>
-                <a href="index.php?generateData">[ Generate data ]</a>
+                <a href="index.php?generateData=1">[ Generate data ]</a>
             </form>
             <br>
             <br>
